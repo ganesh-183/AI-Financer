@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI FINANCER</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1 class="fade-in">AI FINANCER</h1>
+  </header>
+
+  <main>
+    <section class="card slide-up">
+      <h2>Budget Planner</h2>
+      <form id="transaction-form">
+        <input type="text" id="desc" placeholder="Description" required />
+        <input type="number" id="amount" placeholder="Amount (₹)" required />
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <button type="submit">Add</button>
+      </form>
+      <div id="overview">
+        <p>Total Income: ₹<span id="total-income">0</span></p>
+        <p>Total Expenses: ₹<span id="total-expenses">0</span></p>
+        <p>Balance: ₹<span id="balance">0</span></p>
+      </div>
+      <h3>Transactions</h3>
+      <ul id="transactions"></ul>
+      <h3>Savings Suggestions</h3>
+      <div id="suggestions">Add some transactions to get tips.</div>
+    </section>
+
+    <section class="card slide-up">
+      <h2>Loan/EMI Calculator</h2>
+      <form id="emi-form">
+        <input type="number" id="loan-amount" placeholder="Loan Amount (₹)" required />
+        <input type="number" id="interest-rate" placeholder="Annual Interest Rate (%)" required />
+        <input type="number" id="loan-tenure" placeholder="Tenure (months)" required />
+        <button type="submit">Calculate EMI</button>
+      </form>
+      <div id="emi-result">
+        <p>Monthly EMI: ₹<span id="emi-value">0</span></p>
+        <p>Total Payment: ₹<span id="total-payment">0</span></p>
+        <p>Total Interest: ₹<span id="total-interest">0</span></p>
+      </div>
+      <h3>Personalized Loan Advice</h3>
+      <div id="loan-advice">Enter loan details to get advice.</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 AI FINANCER</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
