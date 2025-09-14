@@ -1,3 +1,14 @@
+// Global username variable
+let currentUsername = localStorage.getItem('ai-financer-username') || '';
+
+// DOM Elements
+const usernameSection = document.getElementById('username-section');
+const mainApp = document.getElementById('main-app');
+const usernameForm = document.getElementById('username-form');
+const usernameInput = document.getElementById('username-input');
+const currentUsernameEl = document.getElementById('current-username');
+const changeUserBtn = document.getElementById('change-user-btn');
+
 // Budget Planner
 const transactionForm = document.getElementById('transaction-form');
 const descInput = document.getElementById('desc');
@@ -9,11 +20,75 @@ const totalExpensesEl = document.getElementById('total-expenses');
 const balanceEl = document.getElementById('balance');
 const suggestionsEl = document.getElementById('suggestions');
 
+// Username management
+usernameForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = usernameInput.value.trim();
+  if (!username || username.length < 2) {
+    alert('Username must be at least 2 characters long');
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      currentUsername = username;
+      localStorage.setItem('ai-financer-username', username);
+      showMainApp();
+      fetchTransactions();
+    } else {
+      alert(data.error || 'Error setting up user');
+    }
+  } catch (error) {
+    alert('Error connecting to server');
+  }
+});
+
+changeUserBtn.addEventListener('click', () => {
+  showUsernameSection();
+});
+
+function showMainApp() {
+  usernameSection.style.display = 'none';
+  mainApp.style.display = 'block';
+  currentUsernameEl.textContent = currentUsername;
+}
+
+function showUsernameSection() {
+  usernameSection.style.display = 'block';
+  mainApp.style.display = 'none';
+  usernameInput.value = '';
+}
+
+// Initialize app
+if (currentUsername) {
+  showMainApp();
+  fetchTransactions();
+} else {
+  showUsernameSection();
+}
+
 // Fetch and render transactions
 async function fetchTransactions() {
-  const res = await fetch('/api/transactions');
-  const data = await res.json();
-  renderTransactions(data);
+  if (!currentUsername) return;
+
+  try {
+    const res = await fetch(`/api/transactions/${currentUsername}`);
+    if (res.ok) {
+      const data = await res.json();
+      renderTransactions(data);
+    } else {
+      console.error('Error fetching transactions');
+    }
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+  }
 }
 
 function renderTransactions(transactions) {
@@ -24,7 +99,7 @@ function renderTransactions(transactions) {
     const li = document.createElement('li');
     li.innerHTML = `
       <span>${t.desc} - ₹${t.amount}</span>
-      <button onclick="deleteTransaction(${t.id})">❌</button>
+      <button onclick="deleteTransaction('${t._id}')">❌</button>
     `;
     if (t.type === 'income') totalIncome += t.amount;
     else totalExpenses += t.amount;
@@ -45,21 +120,31 @@ transactionForm.addEventListener('submit', async (e) => {
   const amount = parseFloat(amountInput.value.trim());
   const type = typeSelect.value;
 
-  if (!desc || isNaN(amount)) return;
+  if (!desc || isNaN(amount) || !currentUsername) return;
 
-  await fetch('/api/transactions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ desc, amount, type })
-  });
+  try {
+    await fetch(`/api/transactions/${currentUsername}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ desc, amount, type })
+    });
 
-  transactionForm.reset();
-  fetchTransactions();
+    transactionForm.reset();
+    fetchTransactions();
+  } catch (error) {
+    console.error('Error adding transaction:', error);
+  }
 });
 
 async function deleteTransaction(id) {
-  await fetch(`/api/transactions/${id}`, { method: 'DELETE' });
-  fetchTransactions();
+  if (!currentUsername) return;
+
+  try {
+    await fetch(`/api/transactions/${currentUsername}/${id}`, { method: 'DELETE' });
+    fetchTransactions();
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+  }
 }
 
 function generateSavingsSuggestions(income, expenses, transactions) {
