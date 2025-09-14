@@ -12,9 +12,23 @@
 <body>
   <header>
     <h1 class="fade-in">AI FINANCER</h1>
+    <div id="user-info" class="user-info">
+      <span>Welcome, </span>
+      <span id="current-username">Guest</span>
+      <button id="change-user-btn" class="change-user-btn">Change User</button>
+    </div>
   </header>
 
-  <main>
+  <!-- Username Input -->
+  <div id="username-section" class="card slide-up">
+    <h2>Enter Your Username</h2>
+    <form id="username-form">
+      <input type="text" id="username-input" placeholder="Enter your username" required />
+      <button type="submit">Start Using AI Financer</button>
+    </form>
+  </div>
+
+  <main id="main-app" style="display: none;">
     <section class="card slide-up">
       <h2>Budget Planner</h2>
       <form id="transaction-form">
